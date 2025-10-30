@@ -1,7 +1,7 @@
 # API RESTful de gestion de chambres d'hôtel
 
 ## Présentation
-Cette application fournit une API REST (FastAPI + MySQL) pour gérer :
+Dans le cadre d'une agence fictive de gestion d'hôtels, cette application fournit une API REST (FastAPI + MySQL) pour gérer :
 - Hôtels
 - Chambres
 - Clients
@@ -18,20 +18,20 @@ Le tout dans une architecture  conteneurisée avec Docker.
 
 ## Lancement du projet
 
-Dans le dossier *hotel* :
+Se rendre dans le dossier *hotel* et exécuter :
 
 ```bash
 docker compose up --build
 ```
-*(Il faut accepter l'avertissement sur la clé `version` du compose, sans incidence)*
+*(Il faut accepter l'avertissement sur la clé `version` du compose)*
 
-L'API sera disponible sur :
+L'API sera ensuite disponible via l'adresse suivante :
 - **http://localhost:8004/docs** (interface Swagger)
 
 ---
 
 ## Initialisation de la base de données
-La première fois, il faut créer les tables dans MySQL :
+La première fois, il faut créer les tables dans MySQL. Pour cela, il suffit de :
 
 1. Rentrer dans le conteneur API :
    ```bash
@@ -41,7 +41,7 @@ La première fois, il faut créer les tables dans MySQL :
    ```bash
    python
    ```
-3. Dans le shell Python, taper :
+3. Taper dans le shell python les commandes suivantes, une par une :
    ```python
    import models.hotel, models.chambre, models.client, models.reservation
    from database import Base, engine
@@ -57,7 +57,7 @@ La première fois, il faut créer les tables dans MySQL :
 
 ## Utilisation : exemples de tests
 
-Tester les routes directement depuis
+Il est possible de tester les routes directement depuis l'interface Swagger, à l'adresse suivante :
 **http://localhost:8004/docs**
 
 Exemples de séquence possible :
@@ -74,7 +74,7 @@ Chaque endpoint est testable en direct via l'interface Swagger !
 
 ## Configuration personnalisée
 
-- Pour changer le port HTTP (par défaut :8004), modifier dans le fichier :
+- Pour changer le port HTTP (par défaut :8004), il faut le modifier le port dans le fichier hotel/docker-compose.yml :
 ```yaml
   api:
     ...
@@ -89,7 +89,7 @@ Chaque endpoint est testable en direct via l'interface Swagger !
 ## Remarques
 - Le projet utilise FastAPI, SQLAlchemy, pymysql et cryptography (attention : si besoin de rebuild, garder cryptography dans requirements.txt)
 - Le code est découpé en modèles (`models`), schémas (`schemas`), services et contrôleurs (`controllers`)
-- Possibilité d'ajouter de nouvelles routes
+- Possibilité d'ajouter de nouvelles routes facilement !
 ---
 
 
@@ -115,7 +115,7 @@ All built with a containerized architecture using Docker.
 
 ## Lancement du projet
 
-Dans le dossier *hotel* :
+In the *hotel* folder :
 
 ```bash
 docker compose up --build
