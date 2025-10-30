@@ -12,7 +12,7 @@ Le tout dans une architecture  conteneurisée avec Docker.
 ---
 
 ## Prérequis
-- **Docker** et **docker-compose** installés
+- **Docker**, **docker-compose** et **python** installés
 
 ---
 
