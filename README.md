@@ -113,7 +113,7 @@ All built with a containerized architecture using Docker.
 
 ---
 
-## Lancement du projet
+## Project launch
 
 In the *hotel* folder :
 
