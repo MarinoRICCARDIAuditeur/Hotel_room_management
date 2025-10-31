@@ -89,6 +89,7 @@ Chaque endpoint est testable en direct via l'interface Swagger !
 ## Remarques
 - Le projet utilise FastAPI, SQLAlchemy, pymysql et cryptography (attention : si besoin de rebuild, garder cryptography dans requirements.txt)
 - Le code est découpé en modèles (`models`), schémas (`schemas`), services et contrôleurs (`controllers`)
+- Il n'est pas possible de réserver une chambre déjà occupée, sur une période donnée.
 - Possibilité d'ajouter de nouvelles routes facilement !
 ---
 
@@ -189,6 +190,7 @@ Each endpoint can be testes directly through the Swagger UI !
 ## Notes
 - The project use **FastAPI**, **SQLAlchemy**, **pymysql** and **cryptography** (Important: if you want to rebuild, make sure `cryptography` stays in ``requirements.txt`)
 - The codebase is organized into **models**, **schemlas**, **services** and **controllers**.
+- It is not possible to book a room that is already occupied for a given period.
 - You can easily add new routes as needed !
 ---
 
