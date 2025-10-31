@@ -120,7 +120,7 @@ In the *hotel* folder :
 ```bash
 docker compose up --build
 ```
-*(You can safely ignore the warning about the `version` key in the compose file - it has no impact.)*
+*(You can safely ignore the warning about the `version` key in the compose file.)*
 
 The API will be available at :
 - **http://localhost:8004/docs** (interface Swagger)
