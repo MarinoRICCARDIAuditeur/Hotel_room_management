@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'app-web'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['app-web:8000']
+  - job_name: 'api-externe'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['api-externe:8080']
+  - job_name: 'admin-console'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['admin-console:8090']

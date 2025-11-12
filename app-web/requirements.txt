@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+pymysql
+cryptography
+httpx
+prometheus-fastapi-instrumentator

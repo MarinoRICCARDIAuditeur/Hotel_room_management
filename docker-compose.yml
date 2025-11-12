@@ -1,33 +1,127 @@
-version: '3.9'
-
 services:
   db:
     image: mysql:8.0
     restart: always
+    env_file:
+      - .env
     environment:
-      MYSQL_DATABASE: hotel_db
-      MYSQL_USER: hotel_user
-      MYSQL_PASSWORD: hotel_pass
-      MYSQL_ROOT_PASSWORD: rootpass
-    ports:
-      - '3306:3306'
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-supersecret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-hotel_db}
+      MYSQL_USER: ${MYSQL_USER:-hotel_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hotel_pass}
     volumes:
       - db_data:/var/lib/mysql
-  api:
-    build: .
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app-web:
+    build:
+      context: ./app-web
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      api-externe:
+        condition: service_started
+    env_file:
+      - .env
     environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: hotel_db
-      DB_USER: hotel_user
-      DB_PASSWORD: hotel_pass
+      DB_HOST: ${APP_DB_HOST:-db}
+      DB_PORT: ${APP_DB_PORT:-3306}
+      DB_NAME: ${APP_DB_NAME:-hotel_db}
+      DB_USER: ${APP_DB_USER:-hotel_user}
+      DB_PASSWORD: ${APP_DB_PASSWORD:-hotel_pass}
+      EXTERNAL_API_URL: ${EXTERNAL_API_BASE_URL:-http://api-externe:8080}
     ports:
-      - "8004:8000"
+      - "${APP_WEB_PORT:-8004}:8000"
+    networks:
+      - backend
+      - frontend
+
+  api-externe:
+    build:
+      context: ./api-externe
+    restart: always
+    ports:
+      - "${EXTERNAL_API_PORT:-8085}:8080"
+    networks:
+      - frontend
+
+  admin-console:
+    build:
+      context: ./admin-console
+    restart: always
+    depends_on:
+      app-web:
+        condition: service_started
+      api-externe:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      APP_WEB_URL: ${ADMIN_APP_WEB_URL:-http://app-web:8000}
+      EXTERNAL_API_URL: ${ADMIN_EXTERNAL_API_URL:-http://api-externe:8080}
+    ports:
+      - "${ADMIN_CONSOLE_PORT:-8090}:8090"
+    networks:
+      - frontend
+
+  proxy-nginx:
+    image: nginx:1.25-alpine
+    restart: always
+    depends_on:
+      app-web:
+        condition: service_started
+      admin-console:
+        condition: service_started
+      api-externe:
+        condition: service_started
+    ports:
+      - "${PROXY_PORT:-8080}:8080"
     volumes:
-      - .:/app
+      - ./proxy-nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - frontend
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - frontend
+
+  grafana:
+    image: grafana/grafana:10.4.1
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_started
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    networks:
+      - frontend
+
+networks:
+  backend:
+  frontend:
+
 volumes:
   db_data:
-
+  prometheus_data:
+  grafana_data:

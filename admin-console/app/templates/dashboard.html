@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Console d'administration Hôtel</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background-color: #f5f5f5; }
+    h1, h2 { color: #0c2d57; }
+    .metrics { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
+    .metric { background: #ffffff; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; background: #ffffff; margin-bottom: 2rem; }
+    th, td { padding: 0.75rem 1rem; border-bottom: 1px solid #e0e0e0; text-align: left; }
+    th { background: #0c2d57; color: #ffffff; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.85rem; }
+    .badge-libre { background: #4caf50; color: #ffffff; }
+    .badge-occupee { background: #f44336; color: #ffffff; }
+    .badge-maintenance { background: #ff9800; color: #ffffff; }
+    .meteo { background: #ffffff; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    footer { margin-top: 3rem; font-size: 0.85rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Console d'administration - Chaîne hôtelière</h1>
+
+  <div class="metrics">
+    <div class="metric">
+      <h2>{{ hotels|length }} hôtels</h2>
+      <p>Total de chambres : {{ chambres_total }}</p>
+      <p>Chambres libres : {{ chambres_libres }}</p>
+    </div>
+    <div class="metric">
+      <h2>{{ reservations|length }} réservations</h2>
+      <p>Source API : <code>{{ app_url }}</code></p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Hôtels</h2>
+    {% if hotels %}
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Adresse</th>
+          <th>Chambres (libres)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for hotel in hotels %}
+        <tr>
+          <td>{{ hotel.nom }}</td>
+          <td>{{ hotel.adresse }}</td>
+          <td><a href="{{ app_url }}/hotels/{{ hotel.id }}/chambres" target="_blank">Voir</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p>Aucun hôtel enregistré pour le moment.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Réservations en cours</h2>
+    {% if reservations %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Client</th>
+          <th>Chambre</th>
+          <th>Du</th>
+          <th>Au</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for resa in reservations %}
+        <tr>
+          <td>{{ resa.id }}</td>
+          <td>{{ resa.client_id }}</td>
+          <td>{{ resa.chambre_id }}</td>
+          <td>{{ resa.date_debut }}</td>
+          <td>{{ resa.date_fin }}</td>
+          <td>{{ resa.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p>Aucune réservation enregistrée.</p>
+    {% endif %}
+  </section>
+
+  <section class="meteo">
+    <h2>Météo (source API externe)</h2>
+    {% if meteo %}
+      <p>{{ meteo.ville }} - {{ meteo.pays }}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Condition</th>
+            <th>Temp. min</th>
+            <th>Temp. max</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jour in meteo.jours %}
+          <tr>
+            <td>{{ jour.date }}</td>
+            <td>{{ jour.condition }}</td>
+            <td>{{ jour.temperature_min }} °C</td>
+            <td>{{ jour.temperature_max }} °C</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Impossible de joindre l'API externe ({{ api_url }}).</p>
+    {% endif %}
+  </section>
+
+  <footer>
+    <p>Console générée automatiquement. Accès API externe : <code>{{ api_url }}</code></p>
+  </footer>
+</body>
+</html>

@@ -1,197 +1,87 @@
-# API RESTful de gestion de chambres d'hôtel
+# TP Hôtel – SI conteneurisé
 
-## Présentation
-Dans le cadre d'une agence fictive de gestion d'hôtels, cette application fournit une API REST (FastAPI + MySQL) pour gérer :
-- Hôtels
-- Chambres
-- Clients
-- Réservations
+Projet DevOps de conteneurisation d'un système d'information métier pour une chaîne hôtelière fictive.
 
-Le tout dans une architecture  conteneurisée avec Docker.
+## 🚀 Démarrage rapide
 
----
+### Prérequis
 
-## Prérequis
-- **Docker**, **docker-compose** et **python** installés
+- **Docker** et **Docker Compose** installés
+- Ports libres : `8004`, `8085`, `8090`, `8080`, `9090`, `3000`
 
----
+### Installation et lancement
 
-## Lancement du projet
-
-Se rendre dans le dossier *hotel* et exécuter :
-
-```bash
-docker compose up --build
-```
-*(Il faut accepter l'avertissement sur la clé `version` du compose)*
-
-L'API sera ensuite disponible via l'adresse suivante :
-- **http://localhost:8004/docs** (interface Swagger)
-
----
-
-## Initialisation de la base de données
-La première fois, il faut créer les tables dans MySQL. Pour cela, il suffit de :
-
-1. Rentrer dans le conteneur API :
+1. **Cloner le dépôt**
    ```bash
-   docker compose exec api bash
+   git clone <url-du-repo>
+   cd tphotel
    ```
-2. Lancer Python :
+
+2. **Créer le fichier d'environnement** (optionnel, des valeurs par défaut sont définies)
    ```bash
-   python
+   cp .env.example .env
    ```
-3. Taper dans le shell python les commandes suivantes, une par une :
-   ```python
-   import models.hotel, models.chambre, models.client, models.reservation
-   from database import Base, engine
-   Base.metadata.create_all(bind=engine)
-   exit()
-   ```
-4. Sortir du conteneur :
+
+3. **Lancer l'application**
    ```bash
-   exit
+   docker compose up -d --build
    ```
 
----
+   ⏱️ La première fois, cela peut prendre quelques minutes (téléchargement des images et construction).
 
-## Utilisation : exemples de tests
+4. **Vérifier que tout fonctionne**
+   ```bash
+   docker compose ps
+   ```
+   Tous les services doivent être `Up` et `healthy` (ou `started`).
 
-Il est possible de tester les routes directement depuis l'interface Swagger, à l'adresse suivante :
-**http://localhost:8004/docs**
+## 🌐 Accès aux services
 
-Exemples de séquence possible :
-1. Créer un hôtel (`POST /hotels`)
-2. Ajouter une chambre à l'hôtel (`POST /hotels/{id}/chambres`)
-3. Créer un client (`POST /clients`)
-4. Faire une réservation (`POST /reservations`)
-5. Lister des réservations (`GET /reservations`)
-6. Vérifier la disponibilité d'une chambre (`GET /chambres/{id}/disponibilite`)
+Une fois les conteneurs démarrés, les services sont accessibles via :
 
-Chaque endpoint est testable en direct via l'interface Swagger !
+| Service | URL | Description |
+|---------|-----|-------------|
+| **API métier** | http://localhost:8004/docs | Interface Swagger de l'API de gestion hôtelière |
+| **API externe (météo)** | http://localhost:8085/docs | Documentation de l'API météo simulée |
+| **Console d'administration** | http://localhost:8090/ | Tableau de bord avec statistiques |
+| **Reverse proxy** | http://localhost:8080 | Point d'entrée unique : `/app/`, `/api/`, `/admin/` |
+| **Prometheus** | http://localhost:9090 | Interface de monitoring |
+| **Grafana** | http://localhost:3000 | Dashboards (login: `admin` / mdp: `admin`) |
 
----
+## 📋 Services disponibles
 
-## Configuration personnalisée
+- **`app-web`** : API FastAPI pour gérer hôtels, chambres, clients et réservations
+- **`db`** : Base de données MySQL 8 (initialisée automatiquement avec `db/init.sql`)
+- **`api-externe`** : Service REST simulé fournissant des prévisions météo
+- **`admin-console`** : Tableau de bord web affichant les statistiques
+- **`proxy-nginx`** : Reverse proxy exposant tous les services sur le port 8080
+- **`prometheus`** + **`grafana`** : Stack de monitoring (bonus)
 
-- Pour changer le port HTTP (par défaut :8004), il faut le modifier le port dans le fichier hotel/docker-compose.yml :
-```yaml
-  api:
-    ...
-    ports:
-      - "8004:8000"
-```
-
-- Les identifiants MySQL sont configurés dans `docker-compose.yml`.
-
----
-
-## Remarques
-- Le projet utilise FastAPI, SQLAlchemy, pymysql et cryptography (attention : si besoin de rebuild, garder cryptography dans requirements.txt)
-- Le code est découpé en modèles (`models`), schémas (`schemas`), services et contrôleurs (`controllers`)
-- Il n'est pas possible de réserver une chambre déjà occupée, sur une période donnée.
-- Possibilité d'ajouter de nouvelles routes facilement !
----
-
-
-                         ### ENGLISH VERSION ###
-
-# RESTful API for Hotel Room Management
-
-## Overview
-This application provides a REST API (FastAPI + MySQL) to manage :
-- Hotels
-- Rooms
-- Clients
-- Reservations
-
-All built with a containerized architecture using Docker.
-
----
-
-# Prerequisites
-- *docker*, *docker-compose* and *python*  must be installed
-
----
-
-## Project launch
-
-In the *hotel* folder :
+## 🛠️ Commandes utiles
 
 ```bash
-docker compose up --build
-```
-*(You can safely ignore the warning about the `version` key in the compose file.)*
+# Arrêter l'application
+docker compose down
 
-The API will be available at :
-- **http://localhost:8004/docs** (interface Swagger)
+# Voir les logs
+docker compose logs -f
 
----
+# Redémarrer un service spécifique
+docker compose restart app-web
 
-## Database initialization
-The first time you run de project, you'll need to create the MySQL tables :
-1. Enter the API container :
-```bash
-docker compose exec api bash
+# Supprimer tout (volumes inclus) pour repartir de zéro
+docker compose down -v
 ```
 
-2. Start Python :
-```bash
-python
-```
+## ⚠️ Dépannage
 
-3. In the Python shell, type :
-```python
-import models.hotel, models.chambre, models.client, models.reservation
-from database import Base, engine
-Base.metadata.create_all(bind=engine)
-exit()
-```
+**MySQL ne démarre pas / erreur "No space left on device"**
+- Vérifier l'espace disque disponible : `df -h`
+- Libérer de l'espace si nécessaire
+- Supprimer le volume MySQL : `docker compose down && docker volume rm tphotel_db_data`
+- Relancer : `docker compose up -d --build`
 
-4. Then, exit the container :
-```bash
-exit()
-```
+## 📚 Documentation complémentaire
 
----
-
-## Usage : Example test
-
-You can test all routes directly from
-**http://localhost:8004/docs**
-
-Example sequence:
-
-1. Create a hotel (`POST /hotels`)
-2. Add a room to the hotel (`POST /hotels/{id}/chambres`)
-3. Create a client (`POST /clients`)
-4. Make a reservation (`POST /reservations`)
-5. List reservation (`GET /reservations`)
-6. Check a room's availability (`GET /chambres/{id}/disponibilite`)
-
-Each endpoint can be testes directly through the Swagger UI !
-
----
-
-## Custom configuration
-
-- To change the HTTP port (default:8004), edit the following in :
-```yaml
-  api:
-    ...
-    ports:
-      - "8004:8000"
-````
-
-- MySQL credentials are configured in the `docker-compose.yml` file.
-
----
-
-## Notes
-- The project use **FastAPI**, **SQLAlchemy**, **pymysql** and **cryptography** (Important: if you want to rebuild, make sure `cryptography` stays in ``requirements.txt`)
-- The codebase is organized into **models**, **schemlas**, **services** and **controllers**.
-- It is not possible to book a room that is already occupied for a given period.
-- You can easily add new routes as needed !
----
-
-
+- `docs/api-externe.md` : Documentation détaillée de l'API météo
+- `db/init.sql` : Schéma de base de données et données de démonstration
