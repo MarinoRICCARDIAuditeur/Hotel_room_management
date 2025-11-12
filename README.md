@@ -13,8 +13,8 @@ Projet DevOps de conteneurisation d'un système d'information métier pour une c
 
 1. **Cloner le dépôt**
    ```bash
-   git clone <url-du-repo>
-   cd tphotel
+   git clone https://github.com/MarinoRICCARDIAuditeur/Hotel_room_management
+   cd Hotel_room_management
    ```
 
 2. **Créer le fichier d'environnement** (optionnel, des valeurs par défaut sont définies)
