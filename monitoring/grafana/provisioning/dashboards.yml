@@ -1,0 +1,13 @@
+apiVersion: 1
+providers:
+  - name: "TPHotel"
+    orgId: 1
+    folder: "TPHotel"
+    type: file
+    updateIntervalSeconds: 30   # rescans the folder periodically
+    disableDeletion: false
+    editable: true
+    options:
+      # On pointe explicitement le fichier (pas seulement le dossier) pour forcer l'import
+      path: /etc/grafana/provisioning/dashboards/tphotel-overview.json
+
