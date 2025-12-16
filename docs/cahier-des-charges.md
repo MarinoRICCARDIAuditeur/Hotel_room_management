@@ -12,7 +12,7 @@
 | Intégration service externe | Endpoint `GET /hotels/{id}/meteo` appellera `api-externe`. |
 | Service externe simulé | `api-externe` (FastAPI météo) + documentation `docs/api-externe.md`. |
 | Administration / supervision | `admin-console` (tableau de bord) + stack Prometheus/Grafana. |
-| Reverse proxy (bonus) | `proxy-nginx` exposant `/app`, `/api`, `/admin`, `/metrics`. |
+| Reverse proxy (bonus) | `proxy-nginx` exposant `/app`, `/api`, `/admin`, `/metrics` sur `localhost:8080`. Support Basic Auth optionnel documenté. |
 | Monitoring (bonus) | `prometheus` + `grafana` avec métriques `/metrics`. |
 | Documentation projet | `README.md`, `docs/` (API externe, cahier des charges). |
 | Données d'initialisation | `db/init.sql`. |

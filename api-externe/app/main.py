@@ -1,11 +1,27 @@
 from datetime import datetime, timedelta
 from random import randint
+
 from fastapi import FastAPI, HTTPException, Query
+from prometheus_client import Counter, Histogram
 from pydantic import BaseModel
 from prometheus_fastapi_instrumentator import Instrumentator
 
-app = FastAPI(title="API Météo Simulée", description="Service externe fictif fournissant une météo quotidienne pour une ville donnée.")
+app = FastAPI(
+    title="API Météo Simulée",
+    description="Service externe fictif fournissant une météo quotidienne pour une ville donnée.",
+)
 Instrumentator().instrument(app).expose(app, include_in_schema=False)
+
+METEO_REQUESTS_TOTAL = Counter(
+    "tphotel_meteo_requests_total",
+    "Nombre total de requêtes météo reçues par ville.",
+    ["ville"],
+)
+METEO_REQUEST_DAYS = Histogram(
+    "tphotel_meteo_requested_days",
+    "Distribution du nombre de jours demandés par requête.",
+    buckets=(1, 2, 3, 4, 5, 6, 7),
+)
 
 class MeteoJour(BaseModel):
     date: datetime
@@ -52,6 +68,8 @@ def meteo(ville: str = Query(..., min_length=2, description="Nom de la ville"), 
     pays = _PAYS_VILLE.get(ville_norm)
     if not pays:
         raise HTTPException(status_code=404, detail="Ville inconnue dans la base de démonstration")
+    METEO_REQUESTS_TOTAL.labels(ville=ville_norm).inc()
+    METEO_REQUEST_DAYS.observe(jours)
     base_temp = randint(5, 25)
     previsions = []
     for i in range(jours):
